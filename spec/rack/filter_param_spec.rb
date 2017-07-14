@@ -36,6 +36,18 @@ RSpec.describe Rack::FilterParam do
     }
   end
 
+  shared_context 'middleware with conditional filter' do
+    let(:app) {
+      Rack::Builder.new do
+        use Rack::FilterParam, {
+          param: :x,
+          if: ->(value) { value == 'yes' }
+        }
+        run -> (env) { [200, {}, ['OK']] }
+      end.to_app
+    }
+  end
+
   shared_examples 'core functionality' do
     context 'sending a param that is not expected to be filtered' do
       let(:params) { { 'a' => '1' } }
@@ -134,6 +146,35 @@ RSpec.describe Rack::FilterParam do
     end
   end
 
+  shared_examples 'conditional filtering' do
+    context 'when the value should be filtered' do
+      let(:params) { { 'x' => 'yes', 'y' => 'no' } }
+
+      it 'filters the param' do
+        expect(params_to_test.keys).to eq ['y']
+      end
+
+      it 'includes the param in `rack.filtered_params`' do
+        expect(last_request.env['rack.filtered_params'])
+          .to eq [['x', nil]]
+      end
+    end
+
+    context 'when the value should not be filtered' do
+      let(:params) { { 'x' => 'no', 'y' => 'no' } }
+
+      it 'does not filter the param' do
+        expect(params_to_test)
+          .to eq('x' => 'no', 'y' => 'no')
+      end
+
+      it 'does not include the param in `rack.filtered_params`' do
+        expect(last_request.env['rack.filtered_params'])
+          .to be nil
+      end
+    end
+  end
+
   context 'GET request' do
     let(:method) { :get }
 
@@ -145,6 +186,11 @@ RSpec.describe Rack::FilterParam do
     describe 'path filtering' do
       include_context 'middleware with filtered paths'
       include_examples 'path filtering'
+    end
+
+    describe 'conditional filtering' do
+      include_context 'middleware with conditional filter'
+      include_examples 'conditional filtering'
     end
   end
 
@@ -166,6 +212,11 @@ RSpec.describe Rack::FilterParam do
       include_context 'middleware with filtered paths'
       include_examples 'path filtering'
     end
+
+    describe 'conditional filtering' do
+      include_context 'middleware with conditional filter'
+      include_examples 'conditional filtering'
+    end
   end
 
   context 'Request previously parsed by ActionDispatch::ParamsParser' do
@@ -185,6 +236,11 @@ RSpec.describe Rack::FilterParam do
     describe 'path filtering' do
       include_context 'middleware with filtered paths'
       include_examples 'path filtering'
+    end
+
+    describe 'conditional filtering' do
+      include_context 'middleware with conditional filter'
+      include_examples 'conditional filtering'
     end
   end
 end

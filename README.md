@@ -45,6 +45,12 @@ Strip a parameter named `client_id` from a fuzzy path:
 use Rack::FilterParam, { param: :client_id, path: /\A\/oauth/ }
 ```
 
+Strip a parameter named `client_id` based on arbitrary logic:
+
+```ruby
+use Rack::FilterParam, { param: :client_id, if: -> (value) { ... } }
+```
+
 To filter multiple parameters, an array of parameters or options hashes can also be passed.
 
 ## Contributing

@@ -23,6 +23,8 @@ module Rack
 
     def process_param(param)
       return unless path_matches?(param)
+      return unless param_exists?(param)
+      return unless affirmative_conditional?(param)
 
       param = param[:param] if param.is_a?(Hash)
 
@@ -41,6 +43,24 @@ module Rack
       return request.env['PATH_INFO'] =~ path if path.is_a?(Regexp)
 
       false
+    end
+
+    def param_exists?(param)
+      param = param.is_a?(Hash) ? param[:param] : param
+      params.has_key?(param.to_s)
+    end
+
+    def params
+      action_dispatch_parsed? ? action_dispatch_params : request.params
+    end
+
+    def affirmative_conditional?(param)
+      return true unless param.is_a?(Hash)
+
+      callable, param = param[:if], param[:param]
+      return true if callable.nil?
+
+      callable.call(params[param.to_s])
     end
 
     def delete_from_action_dispatch(param)
