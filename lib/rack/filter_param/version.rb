@@ -1,5 +1,5 @@
 module Rack
-  class FilterParam
+  module FilterParam
     VERSION = "0.2.1"
   end
 end

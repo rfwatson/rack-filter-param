@@ -7,7 +7,7 @@ RSpec.describe Rack::FilterParam do
   let(:headers)         { {} }
   let(:rack_env)        { {} }
   let(:params_to_test)  {
-    last_request.env[described_class::ACTION_DISPATCH_KEY] || last_request.params
+    last_request.env[Rack::FilterParam::ACTION_DISPATCH_KEY] || last_request.params
   }
 
   before {
@@ -225,7 +225,7 @@ RSpec.describe Rack::FilterParam do
     let(:params) { super().to_json }
 
     let(:rack_env) {
-      { described_class::ACTION_DISPATCH_KEY => params }
+      { Rack::FilterParam::ACTION_DISPATCH_KEY => params }
     }
 
     describe 'basic functionality' do
