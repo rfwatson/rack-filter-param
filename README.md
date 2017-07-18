@@ -2,6 +2,8 @@
 
 Refactoring something behind an API? Plagued by extraneous HTTP params? `rack-filter-param` might be for you.
 
+[![Build Status](https://travis-ci.org/rfwatson/rack-filter-param.svg?branch=master)](https://travis-ci.org/rfwatson/rack-filter-param)
+
 ## What is it?
 
 [Rack](https://github.com/rack/rack) middleware to remove specific params from HTTP requests.
